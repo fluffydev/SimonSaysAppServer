@@ -38,5 +38,6 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+    <string name="title_activity_connection">ConnectionActivity</string>
 
 </resources>
