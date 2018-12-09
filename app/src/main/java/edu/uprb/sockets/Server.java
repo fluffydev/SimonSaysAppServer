@@ -1,7 +1,8 @@
 package edu.uprb.sockets;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -9,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Random;
 
 import edu.uprb.simonsaysapp.ConnectionActivity;
 
@@ -20,7 +22,7 @@ public class Server {
     ConnectionActivity activity;
     ServerSocket serverSocket;
     String message = "";
-    static final int socketServerPORT = 8080;
+    static final int socketServerPORT = 6000;
 
     public Server(ConnectionActivity activity) {
         this.activity = activity;
@@ -54,10 +56,15 @@ public class Server {
 
                 while (true) {
                     Socket socket = serverSocket.accept();
+                    DataInputStream dis = new DataInputStream(socket.getInputStream());
+
+                    int playerCtr = dis.readInt();
+
                     count++;
+
                     message += "#" + count + " from "
                             + socket.getInetAddress() + ":"
-                            + socket.getPort() + "\n";
+                            + socket.getPort() + "\n" + "Repetitions: " + playerCtr + "\n";
 
                     activity.runOnUiThread(new Runnable() {
 
@@ -68,7 +75,7 @@ public class Server {
                     });
 
                     SocketServerReplyThread socketServerReplyThread = new SocketServerReplyThread(
-                            socket, count);
+                            socket, count, playerCtr);
                     socketServerReplyThread.run();
 
                 }
@@ -83,21 +90,38 @@ public class Server {
     private class SocketServerReplyThread extends Thread {
 
         private Socket hostThreadSocket;
-        int cnt;
+        private int cnt;
+        private int playerCtr;
 
-        SocketServerReplyThread(Socket socket, int c) {
+        SocketServerReplyThread(Socket socket, int c, int ctr) {
             hostThreadSocket = socket;
             cnt = c;
+            playerCtr = ctr;
         }
+
+        //int[] combination = SimonSaysUtil.generateCombination(playerCtr);
 
         @Override
         public void run() {
-            OutputStream outputStream;
-            String msgReply = "Hello from Server, you are #" + cnt;
+
+            //ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            //OutputStream outputStream;
+
+            String msgReply = "Hello from Server, Combination " + cnt + " is ready! Press \"Play Game\" to Play";
 
             try {
-                outputStream = hostThreadSocket.getOutputStream();
-                PrintStream printStream = new PrintStream(outputStream);
+                //dataOut = new DataOutputStream(hostThreadSocket.getOutputStream());
+
+                DataOutputStream dataOut = new DataOutputStream((hostThreadSocket.getOutputStream()));
+
+                dataOut.writeInt(playerCtr);
+
+                Random random = new Random();
+                for (int i = 0; i < playerCtr; i++) { dataOut.writeInt(random.nextInt(playerCtr + 1)); }
+
+//                outputStream = hostThreadSocket.getOutputStream();
+                PrintStream printStream = new PrintStream(dataOut);
                 printStream.print(msgReply);
                 printStream.close();
 
@@ -106,9 +130,7 @@ public class Server {
                 activity.runOnUiThread(new Runnable() {
 
                     @Override
-                    public void run() {
-                        activity.msg.setText(message);
-                    }
+                    public void run() {activity.msg.setText(message);}
                 });
 
             } catch (IOException e) {
@@ -125,7 +147,6 @@ public class Server {
                 }
             });
         }
-
     }
 
     public String getIpAddress() {

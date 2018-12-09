@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simon Dice</string>
+    <string name="app_name">Simon Dice Servidor</string>
     <string name="clicks_label">Tocadas:</string>
     <string name="player1_label">Jugador 1:</string>
     <string name="player2_label">Jugador 2:</string>
