@@ -25,18 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="edu.uprb.simonsaysapp.SettingsActivity"
-            android:label="@string/menu_settings"></activity>
-        <activity
-            android:name="edu.uprb.simonsaysapp.AboutActivity"
-            android:label="@string/menu_about"></activity>
-        <activity
-            android:name="edu.uprb.simonsaysapp.SimonSaysActivity"
-            android:label="layout_activity_simonsays"></activity>
-        <!--<activity-->
-            <!--android:name="edu.uprb.simonsaysapp.ConnectionActivity"-->
-            <!--android:label="@string/title_activity_connection"></activity>-->
     </application>
 
 </manifest>

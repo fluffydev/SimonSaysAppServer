@@ -1,5 +1,23 @@
 package edu.uprb.sockets;
 
+/*
+
+ * File: Server.java
+
+ * Author: Víctor M. Martínez 845-09-4440
+
+ * Course: SICI 4037-LJ1, Dr. Juan M. Solá
+
+ * Date: December 7, 2018
+
+ * This class handles server side operations for the Simon Says app
+
+ * It handles operations through an instance of the Server Socket object
+
+ * of the Java API.
+
+ */
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,7 +33,7 @@ import java.util.Random;
 import edu.uprb.simonsaysapp.ConnectionActivity;
 
 /**
- * Created by Fluffy on 12/6/2018.
+ * Created by Víctor M. Martínez on 12/6/2018.
  */
 
 public class Server {
@@ -24,27 +42,47 @@ public class Server {
     String message = "";
     static final int socketServerPORT = 6000;
 
+    /*
+
+     * Initializes the socked server thread that handles incoming communication from the
+
+     * client application.
+
+     */
     public Server(ConnectionActivity activity) {
         this.activity = activity;
         Thread socketServerThread = new Thread(new SocketServerThread());
         socketServerThread.start();
     }
 
+    /*
+     * Returns the port of the server socket.
+     */
     public int getPort() {
         return socketServerPORT;
     }
 
+    /*
+     * Destroys the server sockets on closing application.
+     */
     public void onDestroy() {
         if (serverSocket != null) {
             try {
                 serverSocket.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+
                 e.printStackTrace();
             }
         }
     }
 
+    /*
+
+     * Receives an interaction request from the client application and displays
+
+     * a message to signal successful connection.
+
+     */
     private class SocketServerThread extends Thread {
 
         int count = 0;
@@ -80,13 +118,19 @@ public class Server {
 
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+
                 e.printStackTrace();
             }
         }
-
     }
 
+    /*
+
+     * Creates the socket server reply thread in order to generate a pattern to return
+
+     * to the client app.
+
+     */
     private class SocketServerReplyThread extends Thread {
 
         private Socket hostThreadSocket;
@@ -99,19 +143,21 @@ public class Server {
             playerCtr = ctr;
         }
 
-        //int[] combination = SimonSaysUtil.generateCombination(playerCtr);
+        /*
 
+         * Runs the reply thread and generates a random integer array to server
+
+         * as input to the client app. This array generates the random pattern the user
+
+         * should match.
+
+         */
         @Override
         public void run() {
-
-            //ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            //OutputStream outputStream;
 
             String msgReply = "Hello from Server, Combination " + cnt + " is ready! Press \"Play Game\" to Play";
 
             try {
-                //dataOut = new DataOutputStream(hostThreadSocket.getOutputStream());
 
                 DataOutputStream dataOut = new DataOutputStream((hostThreadSocket.getOutputStream()));
 
@@ -120,12 +166,11 @@ public class Server {
                 Random random = new Random();
                 for (int i = 0; i < playerCtr; i++) { dataOut.writeInt(random.nextInt(playerCtr + 1)); }
 
-//                outputStream = hostThreadSocket.getOutputStream();
                 PrintStream printStream = new PrintStream(dataOut);
                 printStream.print(msgReply);
                 printStream.close();
 
-                message += "replayed: " + msgReply + "\n";
+                message += "replied: " + msgReply + "\n";
 
                 activity.runOnUiThread(new Runnable() {
 
@@ -134,7 +179,6 @@ public class Server {
                 });
 
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 message += "Something wrong! " + e.toString() + "\n";
             }
@@ -149,6 +193,9 @@ public class Server {
         }
     }
 
+    /*
+     * Gets the IP Address of the device running the server application.
+     */
     public String getIpAddress() {
         String ip = "";
         try {
@@ -171,7 +218,6 @@ public class Server {
             }
 
         } catch (SocketException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             ip += "Something Wrong! " + e.toString() + "\n";
         }
